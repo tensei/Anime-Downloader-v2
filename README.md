@@ -28,7 +28,7 @@
 
 ## Requirements 
 
-* .NET Framework 4.5
+* .NET Framework 4.6.1
 
 
 ## Copyright
