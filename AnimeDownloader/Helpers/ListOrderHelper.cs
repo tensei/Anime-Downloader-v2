@@ -34,7 +34,8 @@ namespace AnimeDownloader.Helpers {
 				GlobalVariables.AnimeInternal =
 					new ObservableCollection<AnimeInfoModel>(GlobalVariables.AnimeInternal.OrderBy(x => x.Status)
 						.ThenBy(x => x.Created));
-				MainWindowViewModel.Instance.Anime = new ReadOnlyObservableCollection<AnimeInfoModel>(GlobalVariables.AnimeInternal);
+				MainWindowViewModel.Instance.Anime =
+					new ReadOnlyObservableCollection<AnimeInfoModel>(GlobalVariables.AnimeInternal);
 				MainWindowViewModel.Instance.OrderedText = GlobalVariables.Order[OrderId];
 			});
 		}
@@ -44,7 +45,8 @@ namespace AnimeDownloader.Helpers {
 				await Task.Delay(250);
 				GlobalVariables.AnimeInternal =
 					new ObservableCollection<AnimeInfoModel>(GlobalVariables.AnimeInternal.OrderBy(x => x.Name));
-				MainWindowViewModel.Instance.Anime = new ReadOnlyObservableCollection<AnimeInfoModel>(GlobalVariables.AnimeInternal);
+				MainWindowViewModel.Instance.Anime =
+					new ReadOnlyObservableCollection<AnimeInfoModel>(GlobalVariables.AnimeInternal);
 				MainWindowViewModel.Instance.OrderedText = GlobalVariables.Order[OrderId];
 			});
 		}
@@ -54,7 +56,8 @@ namespace AnimeDownloader.Helpers {
 				await Task.Delay(250);
 				GlobalVariables.AnimeInternal =
 					new ObservableCollection<AnimeInfoModel>(GlobalVariables.AnimeInternal.OrderBy(x => x.Created));
-				MainWindowViewModel.Instance.Anime = new ReadOnlyObservableCollection<AnimeInfoModel>(GlobalVariables.AnimeInternal);
+				MainWindowViewModel.Instance.Anime =
+					new ReadOnlyObservableCollection<AnimeInfoModel>(GlobalVariables.AnimeInternal);
 				MainWindowViewModel.Instance.OrderedText = GlobalVariables.Order[OrderId];
 			});
 		}

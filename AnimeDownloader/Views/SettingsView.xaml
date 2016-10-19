@@ -1,13 +1,14 @@
 ﻿<UserControl x:Class="AnimeDownloader.Views.SettingsView"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:local="clr-namespace:AnimeDownloader.Views"
-             xmlns:viewmodels="clr-namespace:AnimeDownloader.ViewModels"
-             mc:Ignorable="d"
-             d:DesignHeight="300" d:DesignWidth="300"
-             d:DataContext="{d:DesignInstance {x:Type viewmodels:SettingsViewModel}, IsDesignTimeCreatable=False}">
+			xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+			xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+			xmlns:local="clr-namespace:AnimeDownloader.Views"
+			xmlns:viewmodels="clr-namespace:AnimeDownloader.ViewModels"
+			xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+			mc:Ignorable="d"
+			d:DesignHeight="400" d:DesignWidth="700"
+			d:DataContext="{d:DesignInstance {x:Type viewmodels:SettingsViewModel}, IsDesignTimeCreatable=False}">
 	<Grid>
 		<Grid.RowDefinitions>
 			<RowDefinition Height="15" />
@@ -26,33 +27,49 @@
 			<ColumnDefinition Width="Auto" />
 			<ColumnDefinition Width="10" />
 			<ColumnDefinition />
+			<ColumnDefinition Width="50" />
 			<ColumnDefinition Width="15" />
 		</Grid.ColumnDefinitions>
 		<TextBlock Grid.Row="1" Grid.Column="1" VerticalAlignment="Center">Client path</TextBlock>
 		<TextBox Grid.Row="1" Grid.Column="3" Text="{Binding TorrentClient}" VerticalAlignment="Center" />
-		<TextBlock Grid.Row="2" Grid.Column="1" VerticalAlignment="Center">File path</TextBlock>
-		<TextBox Grid.Row="2" Grid.Column="3" Text="{Binding TorrentFiles}" VerticalAlignment="Center" />
+		<Button Grid.Row="1" Grid.Column="4" Height="25" Width="30" VerticalContentAlignment="Center" Padding="2" Background="Transparent"
+				Command="{Binding SearchClientCommand}">
+			<materialDesign:PackIcon Kind="DotsHorizontal"/>
+		</Button>
+		<!--<TextBlock Grid.Row="2" Grid.Column="1" VerticalAlignment="Center">File path</TextBlock>
+		<TextBox Grid.Row="2" Grid.Column="3" Text="{Binding TorrentFiles}" VerticalAlignment="Center" />-->
+		
 		<TextBlock Grid.Row="3" Grid.Column="1" VerticalAlignment="Center">Ongoing path</TextBlock>
 		<TextBox Grid.Row="3" Grid.Column="3" Text="{Binding OngoingFolder}" VerticalAlignment="Center" />
+		<Button Grid.Row="3" Grid.Column="4" Height="25" Width="30" VerticalContentAlignment="Center" Padding="2" Background="Transparent" 
+				Command="{Binding SearchOngoingCommand}">
+			<materialDesign:PackIcon Kind="DotsHorizontal"/>
+		</Button>
+		
 		<TextBlock Grid.Row="4" Grid.Column="1" VerticalAlignment="Center">Refresh time</TextBlock>
 		<TextBox Grid.Row="4" Grid.Column="3" Text="{Binding RefreshTime}" VerticalAlignment="Center" />
-		<TextBlock Grid.Row="5" Grid.Column="1" VerticalAlignment="Center">Group's</TextBlock>
+		
+		<!--<TextBlock Grid.Row="5" Grid.Column="1" VerticalAlignment="Center">Group's</TextBlock>
 		<StackPanel Grid.Row="5" Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center">
-			<ComboBox ItemsSource="{Binding Groups}" Text="{Binding GroupBoxText, Mode=TwoWay}" MinWidth="100" IsEditable="True" />
+			<ComboBox ItemsSource="{Binding Groups}" Text="{Binding GroupBoxText, Mode=TwoWay}" MinWidth="100"
+					IsEditable="True" />
 			<Button Margin="5,0" Command="{Binding AddGroupCommand}">Add</Button>
 			<Button Command="{Binding RemoveGroupCommand}">Remove</Button>
-		</StackPanel>
-		<TextBlock Grid.Row="6" Grid.Column="1" VerticalAlignment="Center">Resolution</TextBlock>
+		</StackPanel>-->
+		
+		<!--<TextBlock Grid.Row="6" Grid.Column="1" VerticalAlignment="Center">Resolution</TextBlock>
 		<ComboBox Grid.Row="6" Grid.Column="3" Text="{Binding Resolution, Mode=TwoWay}" VerticalAlignment="Center">
 			<ComboBoxItem Content="480p" />
 			<ComboBoxItem Content="720p" />
 			<ComboBoxItem Content="1080p" />
-		</ComboBox>
-		<TextBlock Grid.Row="7" Grid.Column="1" VerticalAlignment="Center">RSS</TextBlock>
-		<ComboBox Grid.Row="7" Grid.Column="3" Text="{Binding Rss, Mode=TwoWay}" VerticalAlignment="Center">
+		</ComboBox>-->
+		
+		<TextBlock Grid.Row="6" Grid.Column="1" VerticalAlignment="Center">RSS</TextBlock>
+		<ComboBox Grid.Row="6" Grid.Column="3" Text="{Binding Rss, Mode=TwoWay}" VerticalAlignment="Center">
 			<ComboBoxItem Content="http://www.nyaa.se/?page=rss&amp;cats=1_37" ToolTip="All" />
 			<ComboBoxItem Content="http://www.nyaa.se/?page=rss&amp;cats=1_37&amp;filter=2" ToolTip="Trusted only" />
 		</ComboBox>
-		<Button Grid.Row="8" Grid.Column="3" Command="{Binding SaveCommand}">Save Settings</Button>
+		
+		<Button Grid.Row="8" Grid.Column="1" Grid.ColumnSpan="4" Command="{Binding SaveCommand}" Background="Transparent">Save Settings</Button>
 	</Grid>
 </UserControl>

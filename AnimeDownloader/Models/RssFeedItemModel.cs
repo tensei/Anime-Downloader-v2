@@ -1,7 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Input;
 using AnimeDownloader.Common;
 using AnimeDownloader.Helpers;
@@ -20,6 +18,7 @@ namespace AnimeDownloader.Models {
 		public string[] NameArray { get; set; }
 		public string Description { get; set; }
 		public int Quality { get; set; } = 3;
+		public string DownloadLink { get; set; }
 		public string Link { get; set; }
 		public string SavePath { get; set; }
 		public string Added => DaysSinceRelease();
@@ -36,10 +35,10 @@ namespace AnimeDownloader.Models {
 		}
 
 		private void Download() {
-			ConvertHelper.RssModelToList(this, SavePath);
 			SavePath = Path.Combine(Settings.Config.OngoingFolder, SavePath);
+			ConvertHelper.RssModelToList(this, SavePath);
 			if (!Directory.Exists(SavePath)) Directory.CreateDirectory(SavePath);
-			DelugeHelper.Add(Link, SavePath);
+			DelugeHelper.Add(DownloadLink, SavePath);
 		}
 	}
 }

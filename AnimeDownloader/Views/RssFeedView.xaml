@@ -10,9 +10,9 @@
 	x:Class="AnimeDownloader.Views.RssFeedView"
 	mc:Ignorable="d"
 	d:DesignHeight="400" d:DesignWidth="750"
-	d:DataContext="{d:DesignInstance {x:Type viewmodels:RssFeedViewModel}, IsDesignTimeCreatable=True}">
+	d:DataContext="{d:DesignInstance {x:Type viewmodels:RssFeedViewModel}, IsDesignTimeCreatable=False}">
 	<UserControl.Resources>
-		<Converters:NotZeroToVisibilityConverter x:Key="NotZeroToVisibilityConverter"/>
+		<Converters:NotZeroToVisibilityConverter x:Key="NotZeroToVisibilityConverter" />
 		<Converters:NullableToVisibilityConverter x:Key="NullableToVisibilityConverter" />
 	</UserControl.Resources>
 	<Grid>
@@ -22,7 +22,7 @@
 			<RowDefinition Height="Auto" />
 		</Grid.RowDefinitions>
 		<materialDesign:ColorZone BorderThickness="0,0,0,1" Background="Transparent" BorderBrush="Black" Height="Auto"
-		                          Margin="0,5">
+								Margin="0,5">
 			<Grid>
 				<Grid.ColumnDefinitions>
 					<ColumnDefinition Width="Auto" />
@@ -32,35 +32,40 @@
 					<ColumnDefinition Width="Auto" />
 				</Grid.ColumnDefinitions>
 				<ComboBox Margin="5" Text="{Binding SelectedQuality, Mode=TwoWay}" Width="100"
-				          SelectedIndex="{Binding SelectedQualityIndex}" VerticalAlignment="Center">
+						SelectedIndex="{Binding SelectedQualityIndex}" VerticalAlignment="Center">
 					<ComboBoxItem>Show all</ComboBoxItem>
 					<ComboBoxItem>A+ only</ComboBoxItem>
 					<ComboBoxItem>Trusted only</ComboBoxItem>
 					<ComboBoxItem>Filter remakes</ComboBoxItem>
 				</ComboBox>
 				<Button Grid.Column="1" Margin="5" Width="50" Background="Transparent" Height="28"
-				        VerticalContentAlignment="Center" Command="{Binding RefreshCommand}" VerticalAlignment="Center">
+						VerticalContentAlignment="Center" Command="{Binding RefreshCommand}" VerticalAlignment="Center">
 					<materialDesign:PackIcon Kind="Refresh" />
 				</Button>
 				<TextBox Grid.Column="3" materialDesign:HintAssist.Hint="Search..." Width="200" Margin="5"
-				         Text="{Binding Filter, Mode=TwoWay}" VerticalAlignment="Center" PreviewKeyDown="UIElement_OnPreviewKeyDown"/>
+						Text="{Binding Filter, Mode=TwoWay}" VerticalAlignment="Center"
+						PreviewKeyDown="UIElement_OnPreviewKeyDown" />
+				<Button Grid.Column="3" Background="Transparent" BorderThickness="0" Height="25" VerticalContentAlignment="Center"
+						HorizontalAlignment="Right" Width="25" Padding="2" Command="{Binding ClearFilterCommand}">
+					<materialDesign:PackIcon Kind="Close"/>
+				</Button>
 				<Button Grid.Column="4" Margin="5" Width="50" Background="Transparent" Height="28"
-				        VerticalContentAlignment="Center" Command="{Binding RefreshCommand}" VerticalAlignment="Center">
+						VerticalContentAlignment="Center" Command="{Binding SearchCommand}" VerticalAlignment="Center">
 					<materialDesign:PackIcon Kind="Magnify" />
 				</Button>
 				<ProgressBar Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,0"
-							 IsIndeterminate="True" Style="{DynamicResource MaterialDesignCircularProgressBar }" 
-							 Visibility="{Binding ProgressBarVisibility}"></ProgressBar>
+							IsIndeterminate="True" Style="{DynamicResource MaterialDesignCircularProgressBar }"
+							Visibility="{Binding ProgressBarVisibility}" />
 				<TextBlock Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center">
-					<Run Text="Last update "></Run>
-					<Run Text="{Binding LastRefresh}"></Run>
+					<Run Text="Last update " />
+					<Run Text="{Binding LastRefresh}" />
 				</TextBlock>
 			</Grid>
 		</materialDesign:ColorZone>
 		<ListBox ItemsSource="{Binding RssFeed}" Grid.Row="1"
-		         HorizontalContentAlignment="Stretch"
-		         VerticalContentAlignment="Stretch"
-		         SelectedItem="{Binding SelectedAnime, Mode=TwoWay}" Padding="0">
+				HorizontalContentAlignment="Stretch"
+				VerticalContentAlignment="Stretch"
+				SelectedItem="{Binding SelectedAnime, Mode=TwoWay}" Padding="0">
 			<ListBox.ItemTemplate>
 				<DataTemplate>
 					<Grid Margin="-8" Height="30" Background="Transparent">
@@ -75,17 +80,22 @@
 							<ColumnDefinition Width="85" />
 						</Grid.ColumnDefinitions>
 
-						<Canvas Width="1" VerticalAlignment="Stretch" Grid.Column="1" Background="Gray" Margin="0,4" Opacity="0.3" />
-						<Canvas Width="1" VerticalAlignment="Stretch" Grid.Column="3" Background="Gray" Margin="0,4" Opacity="0.3" />
-						<Button Grid.Column="0" Background="Transparent" HorizontalAlignment="Center" VerticalAlignment="Center"
-						        Height="29" Width="38"
-						        Padding="3" BorderThickness="0"
-						        Command="{Binding DownloadCommand}">
-							<materialDesign:PackIcon Kind="Download" HorizontalAlignment="Center" VerticalAlignment="Center" />
+						<Canvas Width="1" VerticalAlignment="Stretch" Grid.Column="1" Background="Gray" Margin="0,4"
+								Opacity="0.3" />
+						<Canvas Width="1" VerticalAlignment="Stretch" Grid.Column="3" Background="Gray" Margin="0,4"
+								Opacity="0.3" />
+						<Button Grid.Column="0" Background="Transparent" HorizontalAlignment="Center"
+								VerticalAlignment="Center"
+								Height="29" Width="38"
+								Padding="3" BorderThickness="0"
+								Command="{Binding DownloadCommand}">
+							<materialDesign:PackIcon Kind="Download" HorizontalAlignment="Center"
+													VerticalAlignment="Center" />
 						</Button>
 						<TextBlock Grid.Column="2" Text="{Binding Name}" VerticalAlignment="Center" Margin="5,0" />
 
-						<TextBlock Grid.Column="4" Text="{Binding Added}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+						<TextBlock Grid.Column="4" Text="{Binding Added}" HorizontalAlignment="Center"
+									VerticalAlignment="Center" />
 					</Grid>
 					<DataTemplate.Triggers>
 						<DataTrigger Binding="{Binding Quality}" Value="1">
@@ -105,7 +115,7 @@
 			</ListBox.ItemTemplate>
 		</ListBox>
 		<materialDesign:ColorZone Grid.Row="2" BorderThickness="0,1" Background="Transparent" BorderBrush="Black"
-		                          Visibility="{Binding SelectedAnime, Converter={StaticResource NullableToVisibilityConverter}}">
+								Visibility="{Binding SelectedAnime, Converter={StaticResource NullableToVisibilityConverter}}">
 			<Grid Margin="0,5">
 				<Grid.RowDefinitions>
 					<RowDefinition />
@@ -113,14 +123,22 @@
 					<RowDefinition />
 				</Grid.RowDefinitions>
 				<TextBlock Grid.Row="0" Margin="10,0" VerticalAlignment="Center" Text="{Binding SelectedAnime.Name}" />
-				<Button Grid.Row="0" Background="Transparent" BorderThickness="0" HorizontalAlignment="Right"
-				        Command="{Binding DeselectCommand}">
-					X
-				</Button>
-				<TextBlock Grid.Row="1" Margin="10,0" VerticalAlignment="Center" Text="{Binding SelectedAnime.Description}" />
-				<TextBox Grid.Row="2" Margin="10,0" VerticalAlignment="Center" Text="{Binding SelectedAnime.SavePath, Mode=TwoWay}"
-				         materialDesign:HintAssist.Hint="Suggested foldername (might be garbage and buggy)"
-				         materialDesign:HintAssist.IsFloating="True" />
+				<StackPanel Grid.Row="0" HorizontalAlignment="Right" Orientation="Horizontal">
+					<Button  Background="Transparent" BorderThickness="0" HorizontalAlignment="Right"
+							Command="{Binding OpenSiteCommand}">
+						<materialDesign:PackIcon Kind="ArrowTopRight"></materialDesign:PackIcon>
+					</Button>
+					<Button  Background="Transparent" BorderThickness="0" HorizontalAlignment="Right"
+							Command="{Binding DeselectCommand}">
+						<materialDesign:PackIcon Kind="Close"></materialDesign:PackIcon>
+					</Button>
+				</StackPanel>
+				<TextBlock Grid.Row="1" Margin="10,0" VerticalAlignment="Center"
+							Text="{Binding SelectedAnime.Description}" />
+				<TextBox Grid.Row="2" Margin="10,0" VerticalAlignment="Center"
+						Text="{Binding SelectedAnime.SavePath, Mode=TwoWay}"
+						materialDesign:HintAssist.Hint="Suggested foldername (might be garbage and buggy)"
+						materialDesign:HintAssist.IsFloating="True" />
 			</Grid>
 		</materialDesign:ColorZone>
 

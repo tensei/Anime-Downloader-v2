@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
-using System.Windows.Navigation;
 using AnimeDownloader.Common;
 using AnimeDownloader.Helpers;
+using AnimeDownloader.Helpers.Torrent_Clients;
 using AnimeDownloader.ViewModels;
 using MaterialDesignThemes.Wpf;
 using Newtonsoft.Json;
@@ -32,6 +32,8 @@ namespace AnimeDownloader.Models {
 		public DateTime Created { get; set; }
 		public string FileLocation { get; set; }
 		public string FolderLocation { get; set; }
+		public float Maximum { get; set; }
+		public float CurrentProgress { get; set; }
 		public PackIconKind Downloaded { get; set; } = PackIconKind.Download;
 
 		[JsonIgnore]
@@ -46,6 +48,8 @@ namespace AnimeDownloader.Models {
 		[JsonIgnore]
 		public ICommand DeleteEntryCommand { get; }
 
+		public Visibility ProgressVisibility { get; set; }
+
 		private string DaysSinceUpdate() {
 			var dateNow = DateTime.Now;
 			var diff = dateNow - Created;
@@ -56,7 +60,7 @@ namespace AnimeDownloader.Models {
 
 		private void DoubleClick() {
 			Status = PackIconKind.Eye;
-			if (FileLocation == string.Empty)return;
+			if (FileLocation == string.Empty) return;
 			if (!File.Exists(FileLocation)) {
 				Process.Start(FolderLocation);
 				return;

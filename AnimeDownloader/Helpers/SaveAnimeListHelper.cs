@@ -34,6 +34,11 @@ namespace AnimeDownloader.Helpers {
 			jsonSettings.DefaultValueHandling = DefaultValueHandling.Populate;
 			var list = JsonConvert.DeserializeObject<ObservableCollection<AnimeInfoModel>>(input, jsonSettings);
 			foreach (var animeInfoModel in list) GlobalVariables.AnimeInternal.Add(animeInfoModel);
+			foreach (var animeInfoModel in list) {
+				if (!GlobalVariables.AllFiles.Contains(animeInfoModel.Name)) {
+					GlobalVariables.AllFiles.Add(animeInfoModel.Name);
+				}
+			}
 		}
 	}
 }

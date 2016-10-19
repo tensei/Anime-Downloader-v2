@@ -17,6 +17,7 @@ namespace AnimeDownloader.ViewModels {
 	public class MainWindowViewModel {
 		public static MainWindowViewModel Instance;
 		public static int OrderId;
+
 		public MainWindowViewModel() {
 			Instance = this;
 
@@ -25,7 +26,7 @@ namespace AnimeDownloader.ViewModels {
 			NyaaCommand = new ActionCommand(ShowNyaa);
 			FolderCommand = new ActionCommand(ShowFolder);
 			OrderCommand = new ActionCommand(ReOrder);
-			CloseCommand = new ActionCommand(() => {Application.Current.Shutdown();});
+			CloseCommand = new ActionCommand(() => { Application.Current.Shutdown(); });
 			StartStopCommand = new ActionCommand(PausPlay);
 			RefreshCommand = new ActionCommand(() => SleeperZ = 3);
 			//debug test
@@ -40,12 +41,20 @@ namespace AnimeDownloader.ViewModels {
 			//		;
 			//	}));
 			//});
+			//FindDefaultTorrentClientHelper.Find();
 			ProcessHelper.LookForClient();
 			BalloonHelper.Show("Starting in 5 seconds...");
 			Task.Run(async () => {
 				//await FolderBuilder.BuildTask();
 				//await Task.Delay(1000);
 				await Start();
+			});
+			Task.Run(async () => {
+				while (true) {
+					await DelugeHelper.CallInfoAsync();
+					await Task.Delay(5000);
+				}
+				// ReSharper disable once FunctionNeverReturns
 			});
 			//var array1 =new[] { "f", "g", "h" };
 			//var array2 =new[] { "f", "g", "h", "j" };
@@ -75,7 +84,7 @@ namespace AnimeDownloader.ViewModels {
 		}
 
 		private void ShowSettings() {
-			if(!TransitionerIndex.Equals(2)) {
+			if (!TransitionerIndex.Equals(2)) {
 				TransitionerIndex = 2;
 				return;
 			}
@@ -83,7 +92,7 @@ namespace AnimeDownloader.ViewModels {
 		}
 
 		private void ShowFolder() {
-			if(!TransitionerIndex.Equals(3)) {
+			if (!TransitionerIndex.Equals(3)) {
 				TransitionerIndex = 3;
 				return;
 			}
@@ -91,17 +100,23 @@ namespace AnimeDownloader.ViewModels {
 		}
 
 		private void ShowNyaa() {
-			if(!TransitionerIndex.Equals(1)) {
+			if (!TransitionerIndex.Equals(1)) {
 				TransitionerIndex = 1;
 				var rssvm = RssFeedViewModel.Instance;
 				var secago = DateTime.Now - rssvm.LastRefresh;
-				if(secago.TotalSeconds < 10) return;
+				if (secago.TotalSeconds < 10) return;
 				GlobalVariables.RssFeedInternal.Clear();
 				rssvm.ProgressBarVisibility = Visibility.Visible;
 				Task.Run(async () => {
-					var y = await RssFeedHelper.GetFeedItemsToDownload(GlobalVariables.Quality[rssvm.SelectedQuality] + rssvm.Filter);
+					var y =
+						await
+							RssFeedHelper.GetFeedItemsToDownload(GlobalVariables.Quality[rssvm.SelectedQuality] +
+																rssvm.Filter);
 					await Application.Current.Dispatcher.BeginInvoke(new Action(() => {
-						if(y == null) { rssvm.ProgressBarVisibility = Visibility.Collapsed; return; }
+						if (y == null) {
+							rssvm.ProgressBarVisibility = Visibility.Collapsed;
+							return;
+						}
 						y.ForEach(a => GlobalVariables.RssFeedInternal.Add(a));
 						rssvm.ProgressBarVisibility = Visibility.Collapsed;
 						rssvm.LastRefresh = DateTime.Now;
@@ -118,50 +133,50 @@ namespace AnimeDownloader.ViewModels {
 
 		private async Task Start() {
 			await Task.Run(async () => {
-				while(true)
-					if(SleeperZ >= 1) {
+				while (true)
+					if (SleeperZ >= 1) {
 						await Task.Delay(1000);
-						if(PausePlayButtonIcon == PackIconKind.Pause)
-							SleeperZ--;
-					} else if(SleeperZ <= 1) {
-						DelugeHelper.CallInfo();
+						if (PausePlayButtonIcon != PackIconKind.Pause) continue;
+						SleeperZ--;
+					} else if (SleeperZ <= 1) {
 						await FolderBuilder.BuildTask();
 						if (!ProcessHelper.LookForClient()) {
 							SleeperZ = Settings.Config.RefreshTime;
 							continue;
 						}
 						var y = await RssFeedHelper.GetFeedItemsToDownload(Settings.Config.Rss);
-						if(y == null) {
+						if (y == null) {
 							SleeperZ = Settings.Config.RefreshTime;
 							continue;
 						}
-						foreach(var folderModel in GlobalVariables.FolderPaths)
-							foreach(var rssFeedItemModel in y) {
+						foreach (var folderModel in GlobalVariables.FolderPaths)
+							foreach (var rssFeedItemModel in y) {
 								var arrayequal = folderModel.EpisodeArray.SequenceEqual(rssFeedItemModel.NameArray);
-								if(GlobalVariables.AllFiles.Contains(rssFeedItemModel.Name))
-									continue;
+								if (GlobalVariables.AllFiles.Contains(rssFeedItemModel.Name)) continue;
 								if (arrayequal) {
 									ConvertHelper.RssModelToList(rssFeedItemModel, folderModel.FolderPath);
-									DelugeHelper.Add(rssFeedItemModel.Link, folderModel.FolderPath);
+									DelugeHelper.Add(rssFeedItemModel.DownloadLink, folderModel.FolderPath);
 									GlobalVariables.AllFiles.Add(rssFeedItemModel.Name);
 									BalloonHelper.Show($"Added {rssFeedItemModel.Name}");
 									await Task.Delay(500);
 									break;
 								}
+
 								if (folderModel.EpisodeArray.Length != rssFeedItemModel.NameArray.Length) continue;
 								var diff = new List<string>();
 								var diffpoistions = new List<int>();
-								for(var index = 0; index < folderModel.EpisodeArray.Length; index++) {
+								for (var index = 0; index < folderModel.EpisodeArray.Length; index++) {
 									var s = folderModel.EpisodeArray[index];
 									var e = rssFeedItemModel.NameArray[index];
 									if (s == e) continue;
 									diff.Add(rssFeedItemModel.NameArray[index]);
 									diffpoistions.Add(index);
 								}
-								if(((diff.Count == 1) && diff[0].Contains("[") && !GlobalVariables.Resolutions.Any(diff[0].Contains) &&
-								    (diffpoistions[0] != 0)) || (diff.Count == 0)) {
+								if (((diff.Count == 1) && diff[0].Contains("[") &&
+									!GlobalVariables.Resolutions.Any(diff[0].Contains) &&
+									(diffpoistions[0] != 0)) || (diff.Count == 0)) {
 									ConvertHelper.RssModelToList(rssFeedItemModel, folderModel.FolderPath);
-									DelugeHelper.Add(rssFeedItemModel.Link, folderModel.FolderPath);
+									DelugeHelper.Add(rssFeedItemModel.DownloadLink, folderModel.FolderPath);
 									GlobalVariables.AllFiles.Add(rssFeedItemModel.Name);
 									BalloonHelper.Show($"Added {rssFeedItemModel.Name}");
 									await Task.Delay(500);

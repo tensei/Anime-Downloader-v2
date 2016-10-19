@@ -5,7 +5,9 @@ using AnimeDownloader.Models;
 namespace AnimeDownloader.Common {
 	public static class GlobalVariables {
 		public static ObservableCollection<AnimeInfoModel> AnimeInternal = new ObservableCollection<AnimeInfoModel>();
-		public static ObservableCollection<RssFeedItemModel> RssFeedInternal = new ObservableCollection<RssFeedItemModel>();
+
+		public static ObservableCollection<RssFeedItemModel> RssFeedInternal =
+			new ObservableCollection<RssFeedItemModel>();
 
 		public static readonly Dictionary<int, string> Order = new Dictionary<int, string> {
 			{0, "Added"},
@@ -23,6 +25,8 @@ namespace AnimeDownloader.Common {
 		public static List<string> AllFiles = new List<string>();
 		public static List<FolderModel> FolderPaths = new List<FolderModel>();
 
-		public static List<string> Resolutions = new List<string> {"240", "360", "480", "560", "720", "1080", "1440"};
+		public static readonly List<string> Resolutions = new List<string> {"240", "360", "480", "560", "720", "1080", "1440"};
+
+		public static string LastDelugeOutput { get; set; }
 	}
 }

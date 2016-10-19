@@ -38,7 +38,8 @@ namespace AnimeDownloader.Helpers {
 				Name = item.Title.Text,
 				Description = item.Summary.Text,
 				Quality = NyaaHelper.GetQuality(item.Summary.Text),
-				Link = item.Links[0].Uri.AbsoluteUri,
+				DownloadLink = item.Links[0].Uri.AbsoluteUri,
+				Link = item.Id,
 				SavePath = StringParser.SuggestedFolderName(item.Title.Text),
 				NameArray = FolderBuilder.SplitName(item.Title.Text)
 			}).ToList();
@@ -76,7 +77,6 @@ namespace AnimeDownloader.Helpers {
 				// Use the HttpClient as usual. Any JS challenge will be solved automatically for you.
 				var content = await _cloudflareClient.GetStringAsync(url);
 				return content;
-
 			} catch (Exception) {
 				return null;
 			}
@@ -86,7 +86,7 @@ namespace AnimeDownloader.Helpers {
 			await Application.Current.Dispatcher.BeginInvoke(new Action(async () => {
 				var window = Application.Current.Windows.OfType<MetroWindow>().FirstOrDefault();
 				_controller = await window.ShowProgressAsync("Nyaa.se", "Detected Cloudflare\n" +
-				                                                        "trying to solve challenge");
+																		"trying to solve challenge");
 				_controller.SetIndeterminate();
 				_controller.SetCancelable(true);
 				_controller.Canceled += (sender, args) => { _controller.CloseAsync(); };

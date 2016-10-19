@@ -12,7 +12,8 @@ namespace AnimeDownloader {
 	public partial class App : Application {
 		private void AppStartup(object sender, StartupEventArgs args) {
 			if (Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName).Length > 1) {
-				MessageBox.Show(AppDomain.CurrentDomain.FriendlyName + " is already running. Application will now close.",
+				MessageBox.Show(
+					AppDomain.CurrentDomain.FriendlyName + " is already running. Application will now close.",
 					"Application running!", MessageBoxButton.OK, MessageBoxImage.Stop);
 				Current.Shutdown();
 			} else {
