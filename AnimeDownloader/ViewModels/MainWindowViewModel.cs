@@ -14,13 +14,14 @@ using PropertyChanged;
 
 namespace AnimeDownloader.ViewModels {
 	[ImplementPropertyChanged]
-	public class MainWindowViewModel {
+	public class MainWindowViewModel
+	{
 		public static MainWindowViewModel Instance;
 		public static int OrderId;
 
 		public MainWindowViewModel() {
 			Instance = this;
-
+		    MessageQueue = new SnackbarMessageQueue();
 			Anime = new ReadOnlyObservableCollection<AnimeInfoModel>(GlobalVariables.AnimeInternal);
 			SettingsCommand = new ActionCommand(ShowSettings);
 			NyaaCommand = new ActionCommand(ShowNyaa);
@@ -59,6 +60,7 @@ namespace AnimeDownloader.ViewModels {
 			//var array1 =new[] { "f", "g", "h" };
 			//var array2 =new[] { "f", "g", "h", "j" };
 			//MessageBox.Show(array1.SequenceEqual(array2).ToString());
+
 		}
 
 		public ICommand SettingsCommand { get; }
@@ -78,6 +80,8 @@ namespace AnimeDownloader.ViewModels {
 		public PackIconKind PausePlayButtonIcon { get; set; } = PackIconKind.Pause;
 
 		public ICommand RefreshCommand { get; }
+
+		public SnackbarMessageQueue MessageQueue { get; set; }
 
 		private void PausPlay() {
 			PausePlayButtonIcon = PausePlayButtonIcon == PackIconKind.Play ? PackIconKind.Pause : PackIconKind.Play;
@@ -142,6 +146,7 @@ namespace AnimeDownloader.ViewModels {
 						await FolderBuilder.BuildTask();
 						if (!ProcessHelper.LookForClient()) {
 							SleeperZ = Settings.Config.RefreshTime;
+							MessageQueue.Enqueue("Deluge not open... please start Deluge", true);
 							continue;
 						}
 						var y = await RssFeedHelper.GetFeedItemsToDownload(Settings.Config.Rss);
@@ -158,6 +163,7 @@ namespace AnimeDownloader.ViewModels {
 									DelugeHelper.Add(rssFeedItemModel.DownloadLink, folderModel.FolderPath);
 									GlobalVariables.AllFiles.Add(rssFeedItemModel.Name);
 									BalloonHelper.Show($"Added {rssFeedItemModel.Name}");
+									MessageQueue.Enqueue($"Added {rssFeedItemModel.Name}", true);
 									await Task.Delay(500);
 									break;
 								}
@@ -179,6 +185,7 @@ namespace AnimeDownloader.ViewModels {
 									DelugeHelper.Add(rssFeedItemModel.DownloadLink, folderModel.FolderPath);
 									GlobalVariables.AllFiles.Add(rssFeedItemModel.Name);
 									BalloonHelper.Show($"Added {rssFeedItemModel.Name}");
+									MessageQueue.Enqueue($"Added {rssFeedItemModel.Name}", true);
 									await Task.Delay(500);
 								}
 							}

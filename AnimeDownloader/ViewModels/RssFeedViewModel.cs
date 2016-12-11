@@ -9,6 +9,8 @@ using AnimeDownloader.Common;
 using AnimeDownloader.Helpers;
 using AnimeDownloader.Models;
 using PropertyChanged;
+using System.Windows.Forms;
+using System.IO;
 
 namespace AnimeDownloader.ViewModels {
 	[ImplementPropertyChanged]
@@ -22,6 +24,7 @@ namespace AnimeDownloader.ViewModels {
 			DeselectCommand = new ActionCommand(() => { SelectedAnime = null; });
 			RefreshCommand = new ActionCommand(() => Refresh());
 			SearchCommand = new ActionCommand(() => Refresh(true));
+			SavePathCommand = new ActionCommand(SelectSavePath);
 			ClearFilterCommand = new ActionCommand(() => {
 				if (Filter == string.Empty) { return; }
 				Filter = string.Empty;
@@ -53,6 +56,7 @@ namespace AnimeDownloader.ViewModels {
 		public ICommand SearchCommand { get; }
 
 		public ICommand OpenSiteCommand { get; }
+		public ICommand SavePathCommand { get; }
 
 		public async void Refresh(bool force = false) {
 			var minago = DateTime.Now - LastRefresh;
@@ -62,13 +66,21 @@ namespace AnimeDownloader.ViewModels {
 			await Task.Run(async () => {
 				var y = await RssFeedHelper.GetFeedItemsToDownload(_quality[SelectedQuality] + Filter);
 				await
-					Application.Current.Dispatcher.BeginInvoke(
+					System.Windows.Application.Current.Dispatcher.BeginInvoke(
 						new Action(() => {
 							y.ForEach(a => GlobalVariables.RssFeedInternal.Add(a));
 							ProgressBarVisibility = Visibility.Collapsed;
 							LastRefresh = DateTime.Now;
 						}));
 			});
+		}
+		private void SelectSavePath() {
+			var dialog = new FolderBrowserDialog();
+			var res = dialog.ShowDialog();
+			if (res != DialogResult.OK) return;
+			if (Directory.Exists(dialog.SelectedPath)) {
+				SelectedAnime.SavePath = dialog.SelectedPath;
+			}
 		}
 	}
 }

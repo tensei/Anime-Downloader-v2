@@ -6,7 +6,6 @@ using System.Windows;
 using System.Windows.Input;
 using AnimeDownloader.Common;
 using AnimeDownloader.Helpers;
-using AnimeDownloader.Helpers.Torrent_Clients;
 using AnimeDownloader.ViewModels;
 using MaterialDesignThemes.Wpf;
 using Newtonsoft.Json;

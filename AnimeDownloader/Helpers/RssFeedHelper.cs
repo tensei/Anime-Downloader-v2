@@ -10,6 +10,7 @@ using System.Windows;
 using System.Xml;
 using AnimeDownloader.Common;
 using AnimeDownloader.Models;
+using AnimeDownloader.ViewModels;
 using CloudFlareUtilities;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
@@ -33,6 +34,7 @@ namespace AnimeDownloader.Helpers {
 
 		public static async Task<List<RssFeedItemModel>> GetFeedItemsToDownload(string url) {
 			var feed = await GetRssContent(url);
+			var cfg = Settings.Load();
 			return feed?.Items.Select(item => new RssFeedItemModel {
 				Released = item.PublishDate.DateTime,
 				Name = item.Title.Text,
@@ -40,9 +42,10 @@ namespace AnimeDownloader.Helpers {
 				Quality = NyaaHelper.GetQuality(item.Summary.Text),
 				DownloadLink = item.Links[0].Uri.AbsoluteUri,
 				Link = item.Id,
-				SavePath = StringParser.SuggestedFolderName(item.Title.Text),
-				NameArray = FolderBuilder.SplitName(item.Title.Text)
-			}).ToList();
+				SuggestedFolderName = StringParser.SuggestedFolderName(item.Title.Text),
+				NameArray = FolderBuilder.SplitName(item.Title.Text),
+				SavePath = Path.Combine(cfg.OngoingFolder, StringParser.SuggestedFolderName(item.Title.Text))
+		}).ToList();
 		}
 
 		private static async Task<SyndicationFeed> GetRssContent(string url) {
@@ -55,7 +58,7 @@ namespace AnimeDownloader.Helpers {
 				_cloudflareClient = null;
 				return feed;
 			} catch (Exception) {
-				//ShowDialog();
+				MainWindowViewModel.Instance.MessageQueue.Enqueue("Cloadflare detected...");
 				var cfContent = await HandleCloudflare(url);
 				if (cfContent == null) return null;
 				var xmlr = XmlReader.Create(new StringReader(cfContent));
@@ -77,21 +80,10 @@ namespace AnimeDownloader.Helpers {
 				// Use the HttpClient as usual. Any JS challenge will be solved automatically for you.
 				var content = await _cloudflareClient.GetStringAsync(url);
 				return content;
-			} catch (Exception) {
+			} catch (Exception e){
+				MainWindowViewModel.Instance.MessageQueue.Enqueue($"Error Solving Cloadflare\n{e.Message}", true);
 				return null;
 			}
-		}
-
-		private static async void ShowDialog() {
-			await Application.Current.Dispatcher.BeginInvoke(new Action(async () => {
-				var window = Application.Current.Windows.OfType<MetroWindow>().FirstOrDefault();
-				_controller = await window.ShowProgressAsync("Nyaa.se", "Detected Cloudflare\n" +
-																		"trying to solve challenge");
-				_controller.SetIndeterminate();
-				_controller.SetCancelable(true);
-				_controller.Canceled += (sender, args) => { _controller.CloseAsync(); };
-				_controller.Closed += (sender, args) => { _controller = null; };
-			}));
 		}
 	}
 }

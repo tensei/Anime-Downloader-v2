@@ -12,6 +12,7 @@ namespace AnimeDownloader.Models {
 	public class RssFeedItemModel {
 		public RssFeedItemModel() {
 			DownloadCommand = new ActionCommand(Download);
+
 		}
 
 		public string Name { get; set; }
@@ -23,6 +24,7 @@ namespace AnimeDownloader.Models {
 		public string SavePath { get; set; }
 		public string Added => DaysSinceRelease();
 		public DateTime Released { get; set; }
+		public string SuggestedFolderName { get; set; }
 
 		public ICommand DownloadCommand { get; }
 
@@ -35,10 +37,19 @@ namespace AnimeDownloader.Models {
 		}
 
 		private void Download() {
-			SavePath = Path.Combine(Settings.Config.OngoingFolder, SavePath);
+			if (!Directory.Exists(SavePath)) {
+				try {
+					Directory.CreateDirectory(SavePath);
+				} catch {
+					
+					MainWindowViewModel.Instance.MessageQueue.Enqueue($"Invalid Save path!\n{SavePath}");
+					return;
+				}
+			}
 			ConvertHelper.RssModelToList(this, SavePath);
 			if (!Directory.Exists(SavePath)) Directory.CreateDirectory(SavePath);
 			DelugeHelper.Add(DownloadLink, SavePath);
+			MainWindowViewModel.Instance.MessageQueue.Enqueue($"Downloading \n{Name}");
 		}
 	}
 }
