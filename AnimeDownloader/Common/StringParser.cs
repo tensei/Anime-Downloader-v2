@@ -15,7 +15,11 @@ namespace AnimeDownloader.Common {
 
 			suggested = Regex.Match(title, @"^([a0-z9\W']+) \[|\(", RegexOptions.IgnoreCase);
 			if (suggested.Success) return suggested.Groups[1].Value.Trim();
-			return string.Empty;
+
+			suggested = Regex.Match(title, @"^\[.+\] (.+)-.+", RegexOptions.IgnoreCase);
+			if (suggested.Success) return suggested.Groups[1].Value.Trim();
+
+			return "ReplaceMe";
 		}
 
 		public static async Task ParseOuput(string output) {

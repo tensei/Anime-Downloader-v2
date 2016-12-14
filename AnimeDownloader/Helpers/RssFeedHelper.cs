@@ -32,20 +32,37 @@ namespace AnimeDownloader.Helpers {
 			}).ToList();
 		}
 
-		public static async Task<List<RssFeedItemModel>> GetFeedItemsToDownload(string url) {
+		public static async Task<List<RssFeedItemModel>> GetFeedItemsToDownload(string url, bool Save = true) {
 			var feed = await GetRssContent(url);
-			var cfg = Settings.Load();
-			return feed?.Items.Select(item => new RssFeedItemModel {
-				Released = item.PublishDate.DateTime,
-				Name = item.Title.Text,
-				Description = item.Summary.Text,
-				Quality = NyaaHelper.GetQuality(item.Summary.Text),
-				DownloadLink = item.Links[0].Uri.AbsoluteUri,
-				Link = item.Id,
-				SuggestedFolderName = StringParser.SuggestedFolderName(item.Title.Text),
-				NameArray = FolderBuilder.SplitName(item.Title.Text),
-				SavePath = Path.Combine(cfg.OngoingFolder, StringParser.SuggestedFolderName(item.Title.Text))
-		}).ToList();
+			var _items = new List<RssFeedItemModel>();
+			MainWindowViewModel.Instance.MessageQueue.Enqueue(Settings.Config.OngoingFolder);
+			foreach (var item in feed.Items) {
+
+				var _feeditem = new RssFeedItemModel {
+					Released = item.PublishDate.DateTime,
+					Name = item.Title.Text,
+					Description = item.Summary.Text,
+					Quality = NyaaHelper.GetQuality(item.Summary.Text),
+					DownloadLink = item.Links[0].Uri.AbsoluteUri,
+					Link = item.Id,
+					NameArray = FolderBuilder.SplitName(item.Title.Text),
+					
+				};
+				var suggestedname = "ReplaceMe";
+				if (Save) {
+					try {
+						suggestedname = StringParser.SuggestedFolderName(item.Title.Text);
+						_feeditem.SuggestedFolderName = suggestedname;
+						_feeditem.SavePath = Path.Combine(Settings.Config.OngoingFolder, suggestedname);
+					} catch {
+						suggestedname = "ReplaceMe";
+						_feeditem.SuggestedFolderName = suggestedname;
+						_feeditem.SavePath = Path.Combine(Settings.Config.OngoingFolder, suggestedname);
+					}
+				}
+				_items.Add(_feeditem);
+			}
+			return _items;			
 		}
 
 		private static async Task<SyndicationFeed> GetRssContent(string url) {

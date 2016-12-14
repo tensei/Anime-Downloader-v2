@@ -149,7 +149,9 @@ namespace AnimeDownloader.ViewModels {
 							MessageQueue.Enqueue("Deluge not open... please start Deluge", true);
 							continue;
 						}
-						var y = await RssFeedHelper.GetFeedItemsToDownload(Settings.Config.Rss);
+						MessageQueue.Enqueue($"Checking {Settings.Config.Rss}");
+						var y = await RssFeedHelper.GetFeedItemsToDownload(Settings.Config.Rss, false);
+						MessageQueue.Enqueue($"{y.Count} Entries in RSS feed");
 						if (y == null) {
 							SleeperZ = Settings.Config.RefreshTime;
 							continue;

@@ -66,8 +66,8 @@
 		
 		<TextBlock Grid.Row="6" Grid.Column="1" VerticalAlignment="Center">RSS</TextBlock>
 		<ComboBox Grid.Row="6" Grid.Column="3" Text="{Binding Rss, Mode=TwoWay}" VerticalAlignment="Center">
-			<ComboBoxItem Content="http://www.nyaa.se/?page=rss&amp;cats=1_37" ToolTip="All" />
-			<ComboBoxItem Content="http://www.nyaa.se/?page=rss&amp;cats=1_37&amp;filter=2" ToolTip="Trusted only" />
+			<ComboBoxItem Content="https://www.nyaa.se/?page=rss&amp;cats=1_37" ToolTip="All" />
+			<ComboBoxItem Content="https://www.nyaa.se/?page=rss&amp;cats=1_37&amp;filter=2" ToolTip="Trusted only" />
 		</ComboBox>
 		
 		<Button Grid.Row="8" Grid.Column="1" Grid.ColumnSpan="4" Command="{Binding SaveCommand}" Background="Transparent">Save Settings</Button>

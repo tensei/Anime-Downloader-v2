@@ -16,10 +16,10 @@ namespace AnimeDownloader.Common {
 		};
 
 		public static readonly Dictionary<string, string> Quality = new Dictionary<string, string> {
-			{"Show all", "http://www.nyaa.se/?page=rss&cats=1_37&filter=0&term="},
-			{"A+ only", "http://www.nyaa.se/?page=rss&cats=1_37&filter=3&term="},
-			{"Trusted only", "http://www.nyaa.se/?page=rss&cats=1_37&filter=2&term="},
-			{"Filter remakes", "http://www.nyaa.se/?page=rss&cats=1_37&filter=1&term="}
+			{"Show all", "https://www.nyaa.se/?page=rss&cats=1_37&filter=0&term="},
+			{"A+ only", "https://www.nyaa.se/?page=rss&cats=1_37&filter=3&term="},
+			{"Trusted only", "https://www.nyaa.se/?page=rss&cats=1_37&filter=2&term="},
+			{"Filter remakes", "https://www.nyaa.se/?page=rss&cats=1_37&filter=1&term="}
 		};
 
 		public static List<string> AllFiles = new List<string>();
