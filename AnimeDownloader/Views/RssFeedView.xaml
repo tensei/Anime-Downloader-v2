@@ -88,7 +88,8 @@
 								VerticalAlignment="Center"
 								Height="29" Width="38"
 								Padding="3" BorderThickness="0"
-								Command="{Binding DownloadCommand}">
+								Command="{Binding DownloadCommand}"
+								ToolTip="Download">
 							<materialDesign:PackIcon Kind="Download" HorizontalAlignment="Center"
 													VerticalAlignment="Center" />
 						</Button>
@@ -122,10 +123,15 @@
 					<RowDefinition />
 					<RowDefinition />
 				</Grid.RowDefinitions>
-				<TextBox Grid.Row="0" Margin="10,4,96,4" VerticalAlignment="Center" Text="{Binding SelectedAnime.Name}" IsReadOnly="True" />
+				<TextBox Grid.Row="0" Margin="10,4,150,4" VerticalAlignment="Center" Text="{Binding SelectedAnime.Name}" IsReadOnly="True" />
 				<StackPanel Grid.Row="0" HorizontalAlignment="Right" Orientation="Horizontal">
 					<Button  Background="Transparent" BorderThickness="0" HorizontalAlignment="Right"
-							Command="{Binding OpenSiteCommand}">
+							Command="{Binding SelectedAnime.DownloadCommand}"
+							 ToolTip="Download">
+						<materialDesign:PackIcon Kind="Download"></materialDesign:PackIcon>
+					</Button>
+					<Button  Background="Transparent" BorderThickness="0" HorizontalAlignment="Right"
+							Command="{Binding OpenSiteCommand}" ToolTip="Open Website">
 						<materialDesign:PackIcon Kind="ArrowTopRight"></materialDesign:PackIcon>
 					</Button>
 					<Button  Background="Transparent" BorderThickness="0" HorizontalAlignment="Right"
