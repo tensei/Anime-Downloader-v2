@@ -9,7 +9,7 @@ namespace AnimeDownloader.Helpers.Torrent_Clients {
 
 		public static void Add(string link, string safeLocation) {
 			//"add -p 'D:/Program Files (x86)/Deluge' 'D:/Development/python34/Anime checker/torrents/[HorribleSubs] Hibike! Euphonium - 13 [720p].mkv.torrent'"
-			var call = $"\"add -p '{safeLocation}' '{link.Replace("https", "http")}'\"";
+			var call = $"\"add -p '{safeLocation.Replace("'", "''")}' '{link.Replace("https", "http")}'\"";
 			call = Regex.Replace(call, @"\\+", "/");
 			StartProcess(call);
 		}
