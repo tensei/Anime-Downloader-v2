@@ -21,9 +21,9 @@ namespace AnimeDownloader.Helpers {
 	public static class RssFeedHelper {
 		private static HttpClient _cloudflareClient;
 
-		private static ProgressDialogController _controller;
+	    public static ProgressDialogController Controller;
 
-		public static async Task<List<AnimeInfoModel>> GetFeedItems(string url) {
+        public static async Task<List<AnimeInfoModel>> GetFeedItems(string url) {
 			var feed = await GetRssContent(url);
 			return feed?.Items.Select(item => new AnimeInfoModel {
 				Created = item.PublishDate.DateTime,
@@ -32,13 +32,13 @@ namespace AnimeDownloader.Helpers {
 			}).ToList();
 		}
 
-		public static async Task<List<RssFeedItemModel>> GetFeedItemsToDownload(string url, bool Save = true) {
+		public static async Task<List<RssFeedItemModel>> GetFeedItemsToDownload(string url, bool save = true) {
 			var feed = await GetRssContent(url);
-			var _items = new List<RssFeedItemModel>();
+			var items = new List<RssFeedItemModel>();
 			MainWindowViewModel.Instance.MessageQueue.Enqueue(Settings.Config.OngoingFolder);
 			foreach (var item in feed.Items) {
 
-				var _feeditem = new RssFeedItemModel {
+				var feeditem = new RssFeedItemModel {
 					Released = item.PublishDate.DateTime,
 					Name = item.Title.Text,
 					Description = item.Summary.Text,
@@ -48,21 +48,21 @@ namespace AnimeDownloader.Helpers {
 					NameArray = FolderBuilder.SplitName(item.Title.Text),
 					
 				};
-				var suggestedname = "ReplaceMe";
-				if (Save) {
-					try {
+			    if (save) {
+				    var suggestedname = "ReplaceMe";
+				    try {
 						suggestedname = StringParser.SuggestedFolderName(item.Title.Text);
-						_feeditem.SuggestedFolderName = suggestedname;
-						_feeditem.SavePath = Path.Combine(Settings.Config.OngoingFolder, suggestedname);
+						feeditem.SuggestedFolderName = suggestedname;
+						feeditem.SavePath = Path.Combine(Settings.Config.OngoingFolder, suggestedname);
 					} catch {
 						suggestedname = "ReplaceMe";
-						_feeditem.SuggestedFolderName = suggestedname;
-						_feeditem.SavePath = Path.Combine(Settings.Config.OngoingFolder, suggestedname);
+						feeditem.SuggestedFolderName = suggestedname;
+						feeditem.SavePath = Path.Combine(Settings.Config.OngoingFolder, suggestedname);
 					}
 				}
-				_items.Add(_feeditem);
+				items.Add(feeditem);
 			}
-			return _items;			
+			return items;			
 		}
 
 		private static async Task<SyndicationFeed> GetRssContent(string url) {
@@ -80,7 +80,7 @@ namespace AnimeDownloader.Helpers {
 				if (cfContent == null) return null;
 				var xmlr = XmlReader.Create(new StringReader(cfContent));
 				var feed = SyndicationFeed.Load(xmlr);
-				if (_controller != null) await _controller.CloseAsync();
+				if (Controller != null) await Controller.CloseAsync();
 				return feed;
 			}
 		}
