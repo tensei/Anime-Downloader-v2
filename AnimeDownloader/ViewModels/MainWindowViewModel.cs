@@ -114,8 +114,7 @@ namespace AnimeDownloader.ViewModels {
 				Task.Run(async () => {
 					var y =
 						await
-							RssFeedHelper.GetFeedItemsToDownload(GlobalVariables.Quality[rssvm.SelectedQuality] +
-																rssvm.Filter);
+							RssFeedHelper.GetFeedItemsToDownload($"https://nyaa.si/?page=rss&c=1_2&f=0&q={rssvm.Filter}");
 					await Application.Current.Dispatcher.BeginInvoke(new Action(() => {
 						if (y == null) {
 							rssvm.ProgressBarVisibility = Visibility.Collapsed;
@@ -149,11 +148,13 @@ namespace AnimeDownloader.ViewModels {
 							MessageQueue.Enqueue("Deluge not open... please start Deluge", true);
 							continue;
 						}
-						MessageQueue.Enqueue($"Checking {Settings.Config.Rss}");
-						var y = await RssFeedHelper.GetFeedItemsToDownload(Settings.Config.Rss, false);
-						MessageQueue.Enqueue($"Checking {Settings.Config.Rss}&offset=2");
-                        y.AddRange(await RssFeedHelper.GetFeedItemsToDownload(Settings.Config.Rss + "&offset=2", false));
-						MessageQueue.Enqueue($"{y.Count} Entries in RSS feed");
+                        MessageQueue.Enqueue($"Checking {Settings.Config.Rss}");
+                        var y = await RssFeedHelper.GetFeedItemsToDownload(Settings.Config.Rss, false);
+                        MessageQueue.Enqueue($"Checking https://nyaa.si/?page=rss&c=1_2&f=0");
+                        y.AddRange(await RssFeedHelper.GetFeedItemsToDownload("https://nyaa.si/?page=rss&c=1_2&f=0", false));
+                        //MessageQueue.Enqueue("Checking https://anidex.moe/rss/cat/1");
+                        //                  y.AddRange(await RssFeedHelper.GetFeedItemsToDownload("https://anidex.moe/rss/cat/1", false));
+                        MessageQueue.Enqueue($"{y.Count} Entries in RSS feed");
 						if (y == null) {
 							SleeperZ = Settings.Config.RefreshTime;
 							continue;

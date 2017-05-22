@@ -36,15 +36,18 @@ namespace AnimeDownloader.Helpers {
 			var feed = await GetRssContent(url);
 			var items = new List<RssFeedItemModel>();
 			MainWindowViewModel.Instance.MessageQueue.Enqueue(Settings.Config.OngoingFolder);
+		    if (feed == null) {
+		        return null;
+		    }
 			foreach (var item in feed.Items) {
 
 				var feeditem = new RssFeedItemModel {
 					Released = item.PublishDate.DateTime,
 					Name = item.Title.Text,
-					Description = item.Summary.Text,
-					Quality = NyaaHelper.GetQuality(item.Summary.Text),
+					//Description = item.Summary.Text,
+					//Quality = NyaaHelper.GetQuality(item.Summary.Text),
 					DownloadLink = item.Links[0].Uri.AbsoluteUri,
-					Link = item.Id,
+					Link = item.Links[0].Uri.AbsoluteUri,
 					NameArray = FolderBuilder.SplitName(item.Title.Text),
 					
 				};

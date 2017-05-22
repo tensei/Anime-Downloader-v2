@@ -64,11 +64,11 @@ namespace AnimeDownloader.ViewModels {
 			ProgressBarVisibility = Visibility.Visible;
 			GlobalVariables.RssFeedInternal.Clear();
 			await Task.Run(async () => {
-				var y = await RssFeedHelper.GetFeedItemsToDownload(_quality[SelectedQuality] + Filter);
+				var y = await RssFeedHelper.GetFeedItemsToDownload($"https://nyaa.si/?page=rss&c=1_2&f=0&q={Filter}");
 				await
 					System.Windows.Application.Current.Dispatcher.BeginInvoke(
 						new Action(() => {
-							y.ForEach(a => GlobalVariables.RssFeedInternal.Add(a));
+                            y?.ForEach(a => GlobalVariables.RssFeedInternal.Add(a));
 							ProgressBarVisibility = Visibility.Collapsed;
 							LastRefresh = DateTime.Now;
 						}));
