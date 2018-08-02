@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -13,8 +15,7 @@ using MaterialDesignThemes.Wpf;
 using PropertyChanged;
 
 namespace AnimeDownloader.ViewModels {
-	[ImplementPropertyChanged]
-	public class MainWindowViewModel
+	public class MainWindowViewModel : INotifyPropertyChanged
 	{
 		public static MainWindowViewModel Instance;
 		public static int OrderId;
@@ -45,18 +46,16 @@ namespace AnimeDownloader.ViewModels {
 			//FindDefaultTorrentClientHelper.Find();
 			ProcessHelper.LookForClient();
 			BalloonHelper.Show("Starting in 5 seconds...");
-			Task.Run(async () => {
 				//await FolderBuilder.BuildTask();
 				//await Task.Delay(1000);
-				await Start();
-			});
+			Start();
 			Task.Run(async () => {
 				while (true) {
-					await DelugeHelper.CallInfoAsync();
+					await QbitTorrentHelper.GetTorrentd();
 					await Task.Delay(5000);
 				}
 				// ReSharper disable once FunctionNeverReturns
-			});
+			}).ConfigureAwait(false);
 			//var array1 =new[] { "f", "g", "h" };
 			//var array2 =new[] { "f", "g", "h", "j" };
 			//MessageBox.Show(array1.SequenceEqual(array2).ToString());
@@ -114,7 +113,7 @@ namespace AnimeDownloader.ViewModels {
 				Task.Run(async () => {
 					var y =
 						await
-							RssFeedHelper.GetFeedItemsToDownload($"https://nyaa.si/?page=rss&c=1_2&f=0&q={rssvm.Filter}");
+							RssFeedHelper.GetFeedItemsToDownload($"https://nyaa.si/?page=rss&c=1_2&f=2&q={rssvm.Filter}");
 					await Application.Current.Dispatcher.BeginInvoke(new Action(() => {
 						if (y == null) {
 							rssvm.ProgressBarVisibility = Visibility.Collapsed;
@@ -134,8 +133,13 @@ namespace AnimeDownloader.ViewModels {
 			await Task.Run(async () => { OrderId = await ListOrderHelper.OrderToggle(OrderId); });
 		}
 
-		private async Task Start() {
-			await Task.Run(async () => {
+		private async void Start() {
+		    try
+		    {
+				var sites = new List<string> {
+				    Settings.Config.Rss,
+                    "https://nyaa.si/?page=rss&c=1_2&f=2",
+				};
 				while (true)
 					if (SleeperZ >= 1) {
 						await Task.Delay(1000);
@@ -143,29 +147,34 @@ namespace AnimeDownloader.ViewModels {
 						SleeperZ--;
 					} else if (SleeperZ <= 1) {
 						await FolderBuilder.BuildTask();
-						if (!ProcessHelper.LookForClient()) {
-							SleeperZ = Settings.Config.RefreshTime;
-							MessageQueue.Enqueue("Deluge not open... please start Deluge", true);
-							continue;
-						}
+						//if (!ProcessHelper.LookForClient()) {
+						//	SleeperZ = Settings.Config.RefreshTime;
+						//	MessageQueue.Enqueue("Deluge not open... please start Deluge", true);
+						//	continue;
+						//}
                         MessageQueue.Enqueue($"Checking {Settings.Config.Rss}");
-                        var y = await RssFeedHelper.GetFeedItemsToDownload(Settings.Config.Rss, false);
-                        MessageQueue.Enqueue($"Checking https://nyaa.si/?page=rss&c=1_2&f=0");
-                        y.AddRange(await RssFeedHelper.GetFeedItemsToDownload("https://nyaa.si/?page=rss&c=1_2&f=0", false));
-                        //MessageQueue.Enqueue("Checking https://anidex.moe/rss/cat/1");
-                        //                  y.AddRange(await RssFeedHelper.GetFeedItemsToDownload("https://anidex.moe/rss/cat/1", false));
-                        MessageQueue.Enqueue($"{y.Count} Entries in RSS feed");
-						if (y == null) {
+					    var rssItems = new List<RssFeedItemModel>();
+					    foreach (var site in sites)
+					    {
+                            var y = await RssFeedHelper.GetFeedItemsToDownload(site, false);
+					        if (y == null)
+					        {
+                                continue;
+					        }
+					        rssItems.AddRange(y);
+					    }
+                        MessageQueue.Enqueue($"{rssItems.Count} Entries in RSS feed");
+						if (rssItems.Count <= 0) {
 							SleeperZ = Settings.Config.RefreshTime;
 							continue;
 						}
 						foreach (var folderModel in GlobalVariables.FolderPaths)
-							foreach (var rssFeedItemModel in y) {
+							foreach (var rssFeedItemModel in rssItems) {
 								var arrayequal = folderModel.EpisodeArray.SequenceEqual(rssFeedItemModel.NameArray);
 								if (GlobalVariables.AllFiles.Contains(rssFeedItemModel.Name)) continue;
 								if (arrayequal) {
 									ConvertHelper.RssModelToList(rssFeedItemModel, folderModel.FolderPath);
-									DelugeHelper.Add(rssFeedItemModel.DownloadLink, folderModel.FolderPath);
+									QbitTorrentHelper.Add(rssFeedItemModel.DownloadLink, folderModel.FolderPath);
 									GlobalVariables.AllFiles.Add(rssFeedItemModel.Name);
 									BalloonHelper.Show($"Added {rssFeedItemModel.Name}");
 									MessageQueue.Enqueue($"Added {rssFeedItemModel.Name}", true);
@@ -173,6 +182,10 @@ namespace AnimeDownloader.ViewModels {
 									break;
 								}
 
+							    if (folderModel.Episode.Contains("Chyuu") && rssFeedItemModel.Name.Contains("Chyuu") && folderModel.Episode.Contains("Fate"))
+							    {
+							        Debug.WriteLine("folder ep: {0} rss ep: {1}", folderModel.Episode, rssFeedItemModel.Name);
+							    }
 								if (folderModel.EpisodeArray.Length != rssFeedItemModel.NameArray.Length) continue;
 								var diff = new List<string>();
 								var diffpoistions = new List<int>();
@@ -183,11 +196,11 @@ namespace AnimeDownloader.ViewModels {
 									diff.Add(rssFeedItemModel.NameArray[index]);
 									diffpoistions.Add(index);
 								}
-								if (((diff.Count == 1) && diff[0].Contains("[") &&
-									!GlobalVariables.Resolutions.Any(diff[0].Contains) &&
-									(diffpoistions[0] != 0)) || (diff.Count == 0)) {
+								if (diff.Count == 1 && diff[0].Contains("[") &&
+								    !GlobalVariables.Resolutions.Any(diff[0].Contains) &&
+								    diffpoistions[0] != 0 || diff.Count == 0) {
 									ConvertHelper.RssModelToList(rssFeedItemModel, folderModel.FolderPath);
-									DelugeHelper.Add(rssFeedItemModel.DownloadLink, folderModel.FolderPath);
+									QbitTorrentHelper.Add(rssFeedItemModel.DownloadLink, folderModel.FolderPath);
 									GlobalVariables.AllFiles.Add(rssFeedItemModel.Name);
 									BalloonHelper.Show($"Added {rssFeedItemModel.Name}");
 									MessageQueue.Enqueue($"Added {rssFeedItemModel.Name}", true);
@@ -196,9 +209,14 @@ namespace AnimeDownloader.ViewModels {
 							}
 						SleeperZ = Settings.Config.RefreshTime;
 						SaveAnimeListHelper.Save();
-					}
-				// ReSharper disable once FunctionNeverReturns
-			});
-		}
+		            }
+		    }
+		    catch (Exception e)
+		    {
+		        Console.WriteLine(e);
+		    }
+        }
+
+	    public event PropertyChangedEventHandler PropertyChanged;
 	}
 }

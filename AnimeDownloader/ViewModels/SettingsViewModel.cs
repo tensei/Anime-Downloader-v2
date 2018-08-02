@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows.Input;
 using AnimeDownloader.Common;
@@ -8,28 +9,15 @@ using System.Windows;
 using System.Windows.Forms;
 
 namespace AnimeDownloader.ViewModels {
-	[ImplementPropertyChanged]
-	public class SettingsViewModel {
+	public class SettingsViewModel : INotifyPropertyChanged{
 		public SettingsViewModel() {
-			SaveCommand = new ActionCommand(Save);
 			AddGroupCommand = new ActionCommand(AddGroup);
 			RemoveGroupCommand = new ActionCommand(RemoveGroup);
 			SearchOngoingCommand = new ActionCommand(() => {Search("ongoing");});
 			SearchClientCommand = new ActionCommand((() => {Search("");}));
 			Load();
 		}
-
-		public string Rss { get; set; }
-
-		public string TorrentClient { get; set; }
-
-		public string OngoingFolder { get; set; }
-
-		public string TorrentFiles { get; set; }
-
-		public string Resolution { get; set; }
-
-		public int RefreshTime { get; set; }
+        
 
 		public string GroupBoxText { get; set; }
 
@@ -59,7 +47,7 @@ namespace AnimeDownloader.ViewModels {
 				var dialog = new FolderBrowserDialog();
 				var result = dialog.ShowDialog();
 				if (result != DialogResult.OK) return;
-				OngoingFolder = dialog.SelectedPath;
+			    Config.OngoingFolder = dialog.SelectedPath;
 				return;
 			}
 			var dialogfile = new System.Windows.Forms.OpenFileDialog {
@@ -72,30 +60,16 @@ namespace AnimeDownloader.ViewModels {
 			var res = dialogfile.ShowDialog();
 			if (res != DialogResult.OK) return;
 			if (dialogfile.FileName.EndsWith("deluge-console.exe")) {
-				TorrentClient = dialogfile.FileName;
+			    Config.TorrentClient = dialogfile.FileName;
 			}
 		}
 
-		private void Load() {
-			TorrentClient = Settings.Config.TorrentClient;
-			OngoingFolder = Settings.Config.OngoingFolder;
-			//TorrentFiles = Settings.Config.TorrentFiles;
-			//Resolution = Settings.Config.Resolution;
-			RefreshTime = Settings.Config.RefreshTime;
-			//Groups = new ObservableCollection<string>(Settings.Config.Groups);
-			//GroupBoxText = Settings.Config.Groups.FirstOrDefault();
-			Rss = Settings.Config.Rss;
+	    public Config Config { get; set; }
+		private void Load()
+		{
+		    Config = Settings.Config;
 		}
-
-		private void Save() {
-			Settings.Config.Rss = Rss;
-			Settings.Config.TorrentClient = TorrentClient;
-			Settings.Config.OngoingFolder = OngoingFolder;
-			//Settings.Config.TorrentFiles = TorrentFiles;
-			//Settings.Config.Resolution = Resolution;
-			Settings.Config.RefreshTime = RefreshTime;
-			//Settings.Config.Groups = Groups.ToList();
-			Settings.Save();
-		}
+        
+	    public event PropertyChangedEventHandler PropertyChanged;
 	}
 }

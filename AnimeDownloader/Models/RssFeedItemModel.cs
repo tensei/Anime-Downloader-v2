@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.IO;
 using System.Windows.Input;
 using AnimeDownloader.Common;
@@ -8,8 +9,7 @@ using AnimeDownloader.ViewModels;
 using PropertyChanged;
 
 namespace AnimeDownloader.Models {
-	[ImplementPropertyChanged]
-	public class RssFeedItemModel {
+	public class RssFeedItemModel : INotifyPropertyChanged {
 		public RssFeedItemModel() {
 			DownloadCommand = new ActionCommand(Download);
 
@@ -48,8 +48,10 @@ namespace AnimeDownloader.Models {
 			}
 			ConvertHelper.RssModelToList(this, SavePath);
 			if (!Directory.Exists(SavePath)) Directory.CreateDirectory(SavePath);
-			DelugeHelper.Add(DownloadLink, SavePath);
+			QbitTorrentHelper.Add(DownloadLink, SavePath);
 			MainWindowViewModel.Instance.MessageQueue.Enqueue($"Downloading \n{Name}");
 		}
+
+	    public event PropertyChangedEventHandler PropertyChanged;
 	}
 }

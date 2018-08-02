@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace AnimeDownloader.Common {
-	public class Config {
+	public class Config : INotifyPropertyChanged{
 		//public List<string> Groups = new List<string>();
 
 		public string OngoingFolder { get; set; } = "";
@@ -14,5 +15,6 @@ namespace AnimeDownloader.Common {
 		public string TorrentClient { get; set; } = "";
 
 		//public string TorrentFiles = "";
+	    public event PropertyChangedEventHandler PropertyChanged;
 	}
 }

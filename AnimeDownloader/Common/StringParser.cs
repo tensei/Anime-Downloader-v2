@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System.Collections.Generic;
+using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
@@ -8,20 +9,30 @@ namespace AnimeDownloader.Common {
 	public class StringParser {
 		public static string SuggestedFolderName(string title) {
 			var suggested = Regex.Match(title, @".+\] ?([a0-z9\W']+) ?\[?- ?[vol.]?\d{0,3}?", RegexOptions.IgnoreCase);
-			if (suggested.Success) return suggested.Groups[1].Value.Trim();
+			if (suggested.Success) return ReplaceStuff(suggested.Groups[1].Value.Trim());
 
 			suggested = Regex.Match(title, @".+\] ([a0-z9\W']+) \d{0,3}$", RegexOptions.IgnoreCase);
-			if (suggested.Success) return suggested.Groups[1].Value.Trim();
+			if (suggested.Success) return ReplaceStuff(suggested.Groups[1].Value.Trim());
 
 			suggested = Regex.Match(title, @"^([a0-z9\W']+) \[|\(", RegexOptions.IgnoreCase);
-			if (suggested.Success) return suggested.Groups[1].Value.Trim();
+			if (suggested.Success) return ReplaceStuff(suggested.Groups[1].Value.Trim());
 
 			suggested = Regex.Match(title, @"^\[.+\] (.+)-.+", RegexOptions.IgnoreCase);
-			if (suggested.Success) return suggested.Groups[1].Value.Trim();
+			if (suggested.Success) return ReplaceStuff(suggested.Groups[1].Value.Trim());
 
 			return "ReplaceMe";
 		}
-
+        private static readonly List<string> ToRemove = new List<string>
+        {
+            "h264",
+            "x264",
+            "xvid"
+        };
+	    private static string ReplaceStuff(string text) {
+	        var r = Regex.Replace(text, "[^a-zA-Z]+", " ").Trim();
+            ToRemove.ForEach(t => r.ToLower().Replace(r, string.Empty));
+	        return r;
+	    }
 		public static async Task ParseOuput(string output) {
 			await Task.Run(() => {
 				var matches = Regex.Matches(output,
@@ -43,7 +54,7 @@ namespace AnimeDownloader.Common {
 							? Visibility.Collapsed
 							: Visibility.Visible;
 
-						animeInfoModel.CurrentProgress = float.Parse(match.Groups["SizeCurrent"].Value, CultureInfo.InvariantCulture);
+						animeInfoModel.CurrentProgress = int.Parse(match.Groups["SizeCurrent"].Value, CultureInfo.InvariantCulture);
 						animeInfoModel.Maximum = float.Parse(match.Groups["SizeMax"].Value, CultureInfo.InvariantCulture);
 					}
 			});

@@ -1,4 +1,8 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Net;
+using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AnimeDownloader.Common;
@@ -8,13 +12,14 @@ namespace AnimeDownloader.Helpers.Torrent_Clients {
 		private static string _fullOutput = string.Empty;
 
 		public static void Add(string link, string safeLocation) {
-			//"add -p 'D:/Program Files (x86)/Deluge' 'D:/Development/python34/Anime checker/torrents/[HorribleSubs] Hibike! Euphonium - 13 [720p].mkv.torrent'"
-			var call = $"\"add -p '{safeLocation.Replace("'", "''")}' '{link.Replace("https", "http")}'\"";
-			call = Regex.Replace(call, @"\\+", "/");
-			StartProcess(call);
-		}
+            //"add -p 'D:/Program Files (x86)/Deluge' 'D:/Development/python34/Anime checker/torrents/[HorribleSubs] Hibike! Euphonium - 13 [720p].mkv.torrent'"
 
-		public static void StartProcess(string call, bool output = false) {
+             var call = $"\"add -p '{safeLocation.Replace("'", "''")}' '{link.Replace("https", "http")}'\"";
+            call = Regex.Replace(call, @"\\+", "/");
+            StartProcess(call);
+        }
+
+	    private static void StartProcess(string call, bool output = false) {
 			var sta = new Process {
 				StartInfo = {
 					FileName = Settings.Config.TorrentClient,
@@ -45,5 +50,6 @@ namespace AnimeDownloader.Helpers.Torrent_Clients {
 			await StringParser.ParseOuput(_fullOutput);
 			GlobalVariables.LastDelugeOutput = _fullOutput;
 		}
+
 	}
 }

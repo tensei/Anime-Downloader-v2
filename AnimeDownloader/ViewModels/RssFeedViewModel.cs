@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows;
@@ -13,10 +14,8 @@ using System.Windows.Forms;
 using System.IO;
 
 namespace AnimeDownloader.ViewModels {
-	[ImplementPropertyChanged]
-	public class RssFeedViewModel {
+	public class RssFeedViewModel : INotifyPropertyChanged{
 		public static RssFeedViewModel Instance;
-		private readonly Dictionary<string, string> _quality = GlobalVariables.Quality;
 
 		public RssFeedViewModel() {
 			Instance = this;
@@ -82,5 +81,7 @@ namespace AnimeDownloader.ViewModels {
 				SelectedAnime.SavePath = dialog.SelectedPath;
 			}
 		}
+
+	    public event PropertyChangedEventHandler PropertyChanged;
 	}
 }

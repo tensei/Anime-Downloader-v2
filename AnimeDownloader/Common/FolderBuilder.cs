@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -35,15 +36,25 @@ namespace AnimeDownloader.Common {
 		}
 
 		public static string[] SplitName(string name) {
-			var splitter = name.Contains(" ") ? ' ' : '_';
-			var splitname = name.Split(splitter).ToList();
-			var toremove =
+		    var splitter = Regex.Replace(name, "[^\\[\\]0-9a-zA-Z]+", " ").Trim();
+
+            var splitname = splitter.Split(' ').ToList();
+            
+            var toremove =
 				(from s in splitname let regex = Regex.Match(s, "^[0-9]+v?[0-9]?$") where regex.Success select s).ToList
 					();
 			toremove.ForEach(x => splitname.Remove(x));
 			splitname = splitname.Select(x => x.Replace(".mkv", string.Empty)).ToList();
 			splitname = splitname.Select(x => x.Replace(".mp4", string.Empty)).ToList();
 			//splitname.ForEach(x => Regex.Replace(x, @"[\.mkv|\.mp4]", string.Empty));
+		    splitname = splitname.Select(x =>
+		    {
+		        if (x.Contains("]["))
+		        {
+		            x = x.Split(']').Last() +"]";
+		        }
+                return x;
+		    }).ToList();
 			return splitname.ToArray();
 		}
 	}

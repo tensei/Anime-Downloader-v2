@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
@@ -12,8 +13,8 @@ using Newtonsoft.Json;
 using PropertyChanged;
 
 namespace AnimeDownloader.Models {
-	[ImplementPropertyChanged]
-	public class AnimeInfoModel {
+
+    public class AnimeInfoModel : INotifyPropertyChanged{
 		public AnimeInfoModel() {
 			DoubleClickCommand = new ActionCommand(DoubleClick);
 			ToggleWatchCommand = new ActionCommand(ToggleWatch);
@@ -31,8 +32,8 @@ namespace AnimeDownloader.Models {
 		public DateTime Created { get; set; }
 		public string FileLocation { get; set; }
 		public string FolderLocation { get; set; }
-		public float Maximum { get; set; }
-		public float CurrentProgress { get; set; }
+        public double Maximum { get; set; }
+        public double CurrentProgress { get; set; }
 		public PackIconKind Downloaded { get; set; } = PackIconKind.Download;
 
 		[JsonIgnore]
@@ -90,5 +91,7 @@ namespace AnimeDownloader.Models {
 			GlobalVariables.AnimeInternal.Remove(this);
 			SaveAnimeListHelper.Save();
 		}
-	}
+
+        public event PropertyChangedEventHandler PropertyChanged;
+    }
 }

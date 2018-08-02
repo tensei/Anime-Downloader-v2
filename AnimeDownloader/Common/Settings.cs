@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -8,7 +9,7 @@ namespace AnimeDownloader.Common {
 		public static Config Config { get; set; }
 		private static readonly string ConfigFile = Path.Combine(Directory.GetCurrentDirectory(), "AnimeDownloader.json");
 
-		public static Config Load() {
+		public static void Load() {
 			if (File.Exists(ConfigFile)) {
 				var input = File.ReadAllText(ConfigFile);
 
@@ -20,11 +21,16 @@ namespace AnimeDownloader.Common {
 			} else {
 				Config = new Config();
 			}
+            Config.PropertyChanged += ConfigOnPropertyChanged;
 			Save();
-			return Config;
 		}
 
-		public static void Save() {
+	    private static void ConfigOnPropertyChanged(object sender, PropertyChangedEventArgs propertyChangedEventArgs)
+	    {
+            Save();
+	    }
+
+	    private static void Save() {
 			var output = JsonConvert.SerializeObject(Config, Formatting.Indented,
 				new StringEnumConverter {CamelCaseText = true});
 

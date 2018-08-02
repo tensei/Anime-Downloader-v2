@@ -31,7 +31,7 @@
 			<ColumnDefinition Width="15" />
 		</Grid.ColumnDefinitions>
 		<TextBlock Grid.Row="1" Grid.Column="1" VerticalAlignment="Center">Client path</TextBlock>
-		<TextBox Grid.Row="1" Grid.Column="3" Text="{Binding TorrentClient}" VerticalAlignment="Center" />
+        <TextBox Grid.Row="1" Grid.Column="3" Text="{Binding Config.TorrentClient}" VerticalAlignment="Center" />
 		<Button Grid.Row="1" Grid.Column="4" Height="25" Width="30" VerticalContentAlignment="Center" Padding="2" Background="Transparent"
 				Command="{Binding SearchClientCommand}">
 			<materialDesign:PackIcon Kind="DotsHorizontal"/>
@@ -40,14 +40,14 @@
 		<TextBox Grid.Row="2" Grid.Column="3" Text="{Binding TorrentFiles}" VerticalAlignment="Center" />-->
 		
 		<TextBlock Grid.Row="3" Grid.Column="1" VerticalAlignment="Center">Ongoing path</TextBlock>
-		<TextBox Grid.Row="3" Grid.Column="3" Text="{Binding OngoingFolder}" VerticalAlignment="Center" />
+        <TextBox Grid.Row="3" Grid.Column="3" Text="{Binding Config.OngoingFolder}" VerticalAlignment="Center" />
 		<Button Grid.Row="3" Grid.Column="4" Height="25" Width="30" VerticalContentAlignment="Center" Padding="2" Background="Transparent" 
 				Command="{Binding SearchOngoingCommand}">
 			<materialDesign:PackIcon Kind="DotsHorizontal"/>
 		</Button>
 		
 		<TextBlock Grid.Row="4" Grid.Column="1" VerticalAlignment="Center">Refresh time</TextBlock>
-		<TextBox Grid.Row="4" Grid.Column="3" Text="{Binding RefreshTime}" VerticalAlignment="Center" />
+        <TextBox Grid.Row="4" Grid.Column="3" Text="{Binding Config.RefreshTime}" VerticalAlignment="Center" />
 		
 		<!--<TextBlock Grid.Row="5" Grid.Column="1" VerticalAlignment="Center">Group's</TextBlock>
 		<StackPanel Grid.Row="5" Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center">
@@ -65,11 +65,9 @@
 		</ComboBox>-->
 		
 		<TextBlock Grid.Row="6" Grid.Column="1" VerticalAlignment="Center">RSS</TextBlock>
-		<ComboBox Grid.Row="6" Grid.Column="3" Text="{Binding Rss, Mode=TwoWay}" VerticalAlignment="Center">
+        <ComboBox Grid.Row="6" Grid.Column="3" Text="{Binding Config.Rss, Mode=TwoWay}" VerticalAlignment="Center">
 			<ComboBoxItem Content="https://www.nyaa.se/?page=rss&amp;cats=1_37" ToolTip="All" />
 			<ComboBoxItem Content="https://www.nyaa.se/?page=rss&amp;cats=1_37&amp;filter=2" ToolTip="Trusted only" />
 		</ComboBox>
-		
-		<Button Grid.Row="8" Grid.Column="1" Grid.ColumnSpan="4" Command="{Binding SaveCommand}" Background="Transparent">Save Settings</Button>
 	</Grid>
 </UserControl>
