@@ -287,7 +287,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>if $(ConfigurationName) == Release copy /B /Y /V "$(TargetPath)" "E:\Development\visual studio 2015\AnimeDownloader.exe"</PostBuildEvent>
+    <PostBuildEvent>if $(ConfigurationName) == Release copy /B /Y /V "$(TargetPath)" "D:\Development\visual studio 2015\AnimeDownloader.exe"</PostBuildEvent>
   </PropertyGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

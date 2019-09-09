@@ -49,18 +49,19 @@ namespace AnimeDownloader.ViewModels {
 				//await FolderBuilder.BuildTask();
 				//await Task.Delay(1000);
 			Start();
-			Task.Run(async () => {
-				while (true) {
-					await QbitTorrentHelper.GetTorrentd();
-					await Task.Delay(5000);
-				}
-				// ReSharper disable once FunctionNeverReturns
-			}).ConfigureAwait(false);
-			//var array1 =new[] { "f", "g", "h" };
-			//var array2 =new[] { "f", "g", "h", "j" };
-			//MessageBox.Show(array1.SequenceEqual(array2).ToString());
-
-		}
+            Task.Run(async () =>
+            {
+                while (true)
+                {
+                    await QbitTorrentHelper.GetTorrentd();
+                    await Task.Delay(5000);
+                }
+                // ReSharper disable once FunctionNeverReturns
+            }).ConfigureAwait(false);
+            //var array1 =new[] { "f", "g", "h" };
+            //var array2 =new[] { "f", "g", "h", "j" };
+            //MessageBox.Show(array1.SequenceEqual(array2).ToString());
+        }
 
 		public ICommand SettingsCommand { get; }
 		public ICommand NyaaCommand { get; }
@@ -174,8 +175,9 @@ namespace AnimeDownloader.ViewModels {
 								if (GlobalVariables.AllFiles.Contains(rssFeedItemModel.Name)) continue;
 								if (arrayequal) {
 									ConvertHelper.RssModelToList(rssFeedItemModel, folderModel.FolderPath);
+									//DelugeHelper.Add(rssFeedItemModel.DownloadLink, folderModel.FolderPath);
 									QbitTorrentHelper.Add(rssFeedItemModel.DownloadLink, folderModel.FolderPath);
-									GlobalVariables.AllFiles.Add(rssFeedItemModel.Name);
+                                    GlobalVariables.AllFiles.Add(rssFeedItemModel.Name);
 									BalloonHelper.Show($"Added {rssFeedItemModel.Name}");
 									MessageQueue.Enqueue($"Added {rssFeedItemModel.Name}", true);
 									await Task.Delay(500);
@@ -200,8 +202,9 @@ namespace AnimeDownloader.ViewModels {
 								    !GlobalVariables.Resolutions.Any(diff[0].Contains) &&
 								    diffpoistions[0] != 0 || diff.Count == 0) {
 									ConvertHelper.RssModelToList(rssFeedItemModel, folderModel.FolderPath);
+									//DelugeHelper.Add(rssFeedItemModel.DownloadLink, folderModel.FolderPath);
 									QbitTorrentHelper.Add(rssFeedItemModel.DownloadLink, folderModel.FolderPath);
-									GlobalVariables.AllFiles.Add(rssFeedItemModel.Name);
+                                    GlobalVariables.AllFiles.Add(rssFeedItemModel.Name);
 									BalloonHelper.Show($"Added {rssFeedItemModel.Name}");
 									MessageQueue.Enqueue($"Added {rssFeedItemModel.Name}", true);
 									await Task.Delay(500);

@@ -26,7 +26,7 @@ namespace AnimeDownloader.Helpers.Torrent_Clients
                 {new StringContent(safeLocation), "savepath"},
                 {new StringContent("Anime"), "category"}
             };
-            await Client.PostAsync(new Uri("http://localhost:8080/command/download"), m);
+            await Client.PostAsync(new Uri("http://localhost:1584/command/download"), m);
         }
 
         private static bool Logged { get; set; }
@@ -42,8 +42,8 @@ namespace AnimeDownloader.Helpers.Torrent_Clients
                 {"username", "admin"},
                 {"password", "123456"},
             };
-            Client.DefaultRequestHeaders.Add("Referer", "http://localhost:8080");
-            var login = await Client.PostAsync("http://localhost:8080/login", new FormUrlEncodedContent(datalogin));
+            Client.DefaultRequestHeaders.Add("Referer", "http://localhost:1584");
+            var login = await Client.PostAsync("http://localhost:1584/login", new FormUrlEncodedContent(datalogin));
             Logged = login.IsSuccessStatusCode;
         }
 
@@ -52,7 +52,7 @@ namespace AnimeDownloader.Helpers.Torrent_Clients
             //query/torrents
             await Login();
 
-            var response = await Client.GetStringAsync("http://localhost:8080/query/torrents?category=Anime");
+            var response = await Client.GetStringAsync("http://localhost:1584/query/torrents?category=Anime");
             try
             {
                 var js = JsonConvert.DeserializeObject<List<Torrent>>(response);

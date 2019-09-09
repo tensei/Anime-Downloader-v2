@@ -65,7 +65,15 @@ namespace AnimeDownloader.Models {
 				Process.Start(FolderLocation);
 				return;
 			}
-			Process.Start(FileLocation);
+
+            try
+            {
+                Process.Start(FileLocation);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
 		}
 
 		private async void ToggleWatch() {
