@@ -20,7 +20,7 @@ namespace AnimeDownloader.Views {
 
 			var binding = BindingOperations.GetBindingExpression(tBox, prop);
 			binding?.UpdateSource();
-			RssFeedViewModel.Instance.Refresh(true);
+			RssFeedViewModel.Instance.Refresh();
 		}
 	}
 }

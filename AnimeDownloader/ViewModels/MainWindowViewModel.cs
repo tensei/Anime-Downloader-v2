@@ -132,7 +132,7 @@ namespace AnimeDownloader.ViewModels
                     var y =
                         await
                             RssFeedHelper.GetFeedItemsToDownload(
-                                $"https://nyaa.si/?page=rss&c=1_2&f=2&q={rssvm.Filter}");
+                                $"https://nyaa.si/?page=rss&c=1_2&f=0&q={rssvm.Filter}");
                     if (Application.Current.Dispatcher != null)
                     {
                         await Application.Current.Dispatcher.BeginInvoke(new Action(() =>

@@ -12,6 +12,7 @@ using AnimeDownloader.Models;
 using PropertyChanged;
 using System.Windows.Forms;
 using System.IO;
+using Application = System.Windows.Application;
 
 namespace AnimeDownloader.ViewModels {
 	public class RssFeedViewModel : INotifyPropertyChanged{
@@ -22,12 +23,12 @@ namespace AnimeDownloader.ViewModels {
 			RssFeed = new ReadOnlyObservableCollection<RssFeedItemModel>(GlobalVariables.RssFeedInternal);
 			DeselectCommand = new ActionCommand(() => { SelectedAnime = null; });
 			RefreshCommand = new ActionCommand(() => Refresh());
-			SearchCommand = new ActionCommand(() => Refresh(true));
+			SearchCommand = new ActionCommand(() => Refresh());
 			SavePathCommand = new ActionCommand(SelectSavePath);
 			ClearFilterCommand = new ActionCommand(() => {
 				if (Filter == string.Empty) { return; }
 				Filter = string.Empty;
-				Refresh(true);
+				Refresh();
 			});
 			OpenSiteCommand = new ActionCommand(() => {
 				Process.Start(SelectedAnime.Link);
@@ -57,29 +58,34 @@ namespace AnimeDownloader.ViewModels {
 		public ICommand OpenSiteCommand { get; }
 		public ICommand SavePathCommand { get; }
 
-		public async void Refresh(bool force = false) {
-			var minago = DateTime.Now - LastRefresh;
-			if (minago.TotalSeconds < 10 && !force) return;
+		public async void Refresh() {
 			ProgressBarVisibility = Visibility.Visible;
 			GlobalVariables.RssFeedInternal.Clear();
-			await Task.Run(async () => {
-				var y = await RssFeedHelper.GetFeedItemsToDownload($"https://nyaa.si/?page=rss&c=1_2&f=0&q={Filter}");
-				await
-					System.Windows.Application.Current.Dispatcher.BeginInvoke(
-						new Action(() => {
-                            y?.ForEach(a => GlobalVariables.RssFeedInternal.Add(a));
-							ProgressBarVisibility = Visibility.Collapsed;
-							LastRefresh = DateTime.Now;
-						}));
-			});
+			await Task.Run(async () =>
+            {
+                var y = await RssFeedHelper.GetFeedItemsToDownload($"https://nyaa.si/?page=rss&c=1_2&f=0&q={Filter}");
+                if (Application.Current.Dispatcher != null)
+                {
+                    await
+                        Application.Current.Dispatcher.BeginInvoke(
+                            new Action(() =>
+                            {
+                                y?.ForEach(a => GlobalVariables.RssFeedInternal.Add(a));
+                                ProgressBarVisibility = Visibility.Collapsed;
+                                LastRefresh = DateTime.Now;
+                            }));
+                }
+            });
 		}
 		private void SelectSavePath() {
-			var dialog = new FolderBrowserDialog();
-			var res = dialog.ShowDialog();
-			if (res != DialogResult.OK) return;
-			if (Directory.Exists(dialog.SelectedPath)) {
-				SelectedAnime.SavePath = dialog.SelectedPath;
-			}
+            using (var dialog = new FolderBrowserDialog())
+            {
+                var res = dialog.ShowDialog();
+			    if (res != DialogResult.OK) return;
+			    if (Directory.Exists(dialog.SelectedPath)) {
+				    SelectedAnime.SavePath = dialog.SelectedPath;
+			    }
+            }
 		}
 
 	    public event PropertyChangedEventHandler PropertyChanged;

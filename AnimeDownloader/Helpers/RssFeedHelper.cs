@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Xml;
+using System.Xml.Linq;
 using AnimeDownloader.Common;
 using AnimeDownloader.Models;
 using AnimeDownloader.ViewModels;
@@ -15,13 +16,13 @@ using CloudFlareUtilities;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
 using MaterialDesignThemes.Wpf;
-using RestSharp;
 
 namespace AnimeDownloader.Helpers {
 	public static class RssFeedHelper {
 		private static HttpClient _cloudflareClient;
 
 	    public static ProgressDialogController Controller;
+
 
         public static async Task<List<AnimeInfoModel>> GetFeedItems(string url) {
 			var feed = await GetRssContent(url);
@@ -44,15 +45,27 @@ namespace AnimeDownloader.Helpers {
 				var feeditem = new RssFeedItemModel {
 					Released = item.PublishDate.DateTime,
 					Name = item.Title.Text,
-					//Description = item.Summary.Text,
-					//Quality = NyaaHelper.GetQuality(item.Summary.Text),
-					DownloadLink = item.Links[0].Uri.AbsoluteUri,
+                    //Description = item.Summary.Text,
+                    DownloadLink = item.Links[0].Uri.AbsoluteUri,
 					Link = item.Links[0].Uri.AbsoluteUri,
 					NameArray = FolderBuilder.SplitName(item.Title.Text),
 					
 				};
+                var remake = item.ElementExtensions.FirstOrDefault(e => e.OuterName == "remake")
+                    ?.GetObject<XElement>().Value == "Yes";
+                if (remake)
+                {
+                    feeditem.Quality = 4;
+                }
+                var trusted = item.ElementExtensions.FirstOrDefault(e => e.OuterName == "trusted")
+                    ?.GetObject<XElement>().Value == "Yes";
+                if (trusted)
+                {
+                    feeditem.Quality = 2;
+                }
+
 			    if (save) {
-				    var suggestedname = "ReplaceMe";
+				    string suggestedname;
 				    try {
 						suggestedname = StringParser.SuggestedFolderName(item.Title.Text);
 						feeditem.SuggestedFolderName = suggestedname;
@@ -69,30 +82,23 @@ namespace AnimeDownloader.Helpers {
 		}
 
 		private static async Task<SyndicationFeed> GetRssContent(string url) {
-			try {
-				var client = new RestClient(url) {Encoding = Encoding.UTF8};
-				var request = new RestRequest();
-				var content = await client.ExecuteTaskAsync(request);
-				var xmlr = XmlReader.Create(new StringReader(content.Content));
+			try
+            {
+                var response = await HandleCloudflare(url);
+				var xmlr = XmlReader.Create(new StringReader(response));
 				var feed = SyndicationFeed.Load(xmlr);
-				_cloudflareClient = null;
 				return feed;
-			} catch (Exception) {
-				MainWindowViewModel.Instance.MessageQueue.Enqueue("Cloadflare detected...");
-				var cfContent = await HandleCloudflare(url);
-				if (cfContent == null) return null;
-				var xmlr = XmlReader.Create(new StringReader(cfContent));
-				var feed = SyndicationFeed.Load(xmlr);
-				if (Controller != null) await Controller.CloseAsync();
-				return feed;
-			}
+			} catch (Exception e) {
+				MainWindowViewModel.Instance.MessageQueue.Enqueue(e.Message);
+                return null;
+            }
 		}
 
 		private static async Task<string> HandleCloudflare(string url) {
 			try {
-				//if (_cloudflareClient != null) return await _cloudflareClient.GetStringAsync(url);
-				// Create the clearance handler.
-				var handler = new ClearanceHandler();
+                if (_cloudflareClient != null) return await _cloudflareClient.GetStringAsync(url);
+                // Create the clearance handler.
+                var handler = new ClearanceHandler();
 
 				// Create a HttpClient that uses the handler.
 				_cloudflareClient = new HttpClient(handler);
@@ -101,7 +107,7 @@ namespace AnimeDownloader.Helpers {
 				var content = await _cloudflareClient.GetStringAsync(url);
 				return content;
 			} catch (Exception e){
-				MainWindowViewModel.Instance.MessageQueue.Enqueue($"Error Solving Cloadflare\n{e.Message}", true);
+				MainWindowViewModel.Instance.MessageQueue.Enqueue($"Error Solving Cloudflare\n{e.Message}", true);
 				return null;
 			}
 		}
