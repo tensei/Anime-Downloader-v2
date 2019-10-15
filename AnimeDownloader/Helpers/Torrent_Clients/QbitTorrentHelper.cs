@@ -42,7 +42,7 @@ namespace AnimeDownloader.Helpers.Torrent_Clients
                 {"username", "admin"},
                 {"password", "123456"},
             };
-            Client.DefaultRequestHeaders.Add("Referer", "http://localhost:1584");
+            Client.DefaultRequestHeaders.Referrer = new Uri("http://localhost:1584");
             var login = await Client.PostAsync("http://localhost:1584/login", new FormUrlEncodedContent(datalogin));
             Logged = login.IsSuccessStatusCode;
         }
