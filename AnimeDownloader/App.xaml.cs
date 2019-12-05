@@ -12,10 +12,12 @@ namespace AnimeDownloader {
 	public partial class App : Application {
 		private void AppStartup(object sender, StartupEventArgs args) {
 			if (Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName).Length > 1) {
-				MessageBox.Show(
+#if !DEBUG
+                MessageBox.Show(
 					AppDomain.CurrentDomain.FriendlyName + " is already running. Application will now close.",
 					"Application running!", MessageBoxButton.OK, MessageBoxImage.Stop);
 				Current.Shutdown();
+#endif
 			} else {
 				Settings.Load();
 				//Waiting for the settings to be loaded

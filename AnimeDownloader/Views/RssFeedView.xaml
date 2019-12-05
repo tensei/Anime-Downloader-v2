@@ -68,8 +68,8 @@
 				SelectedItem="{Binding SelectedAnime, Mode=TwoWay}" Padding="0">
 			<ListBox.ItemTemplate>
 				<DataTemplate>
-					<Grid Margin="-8" Height="30" Background="Transparent">
-						<!--<Grid.InputBindings>
+					<Grid Margin="-8" Height="30">
+                        <!--<Grid.InputBindings>
                             <MouseBinding Gesture="LeftDoubleClick" Command="{Binding DownloadCommand}"/>
                         </Grid.InputBindings>-->
 						<Grid.ColumnDefinitions>
