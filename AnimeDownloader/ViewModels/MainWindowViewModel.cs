@@ -55,7 +55,7 @@ namespace AnimeDownloader.ViewModels
             {
                 while (true)
                 {
-                    await QbitTorrentHelper.GetTorrentd();
+                    await QbitTorrentHelper.GetTorrents();
                     await Task.Delay(5000);
                 }
 

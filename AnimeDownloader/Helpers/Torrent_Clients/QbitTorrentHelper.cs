@@ -48,7 +48,7 @@ namespace AnimeDownloader.Helpers.Torrent_Clients
             Logged = login.IsSuccessStatusCode;
         }
 
-        public static async Task GetTorrentd()
+        public static async Task GetTorrents()
         {
             //query/torrents
             await Login();
@@ -65,7 +65,7 @@ namespace AnimeDownloader.Helpers.Torrent_Clients
             }
         }
 
-        private static void UpdateAnime(List<Torrent> torrents)
+        private static void UpdateAnime(IEnumerable<Torrent> torrents)
         {
             foreach (var torrent in torrents)
             {
